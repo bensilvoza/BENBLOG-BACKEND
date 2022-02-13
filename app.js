@@ -6,12 +6,19 @@ require("dotenv").config();
 
 // require routes
 var index = require("./routes/index");
-// var administrator = require("./routes/administrator");
+var posts = require("./routes/posts");
 // var products = require("./routes/products");
 // var checkout = require("./routes/checkout");
 
+// ===
+// ENV
+// ===
 // process.env.ENV_VARIABLE_NAME
 var dbUrl = process.env.DB_URL;
+// protectRoute
+// Protecting the route from unathorized access
+// adding checkpoint in endpoint
+var protectRoute = process.env.PROTECT_ROUTE;
 
 // use
 var app = express();
@@ -31,8 +38,8 @@ connection.once("open", function () {
 // ======
 // ROUTES
 // ======
-app.use(index);
-// app.use(administrator);
+app.use(`/${protectRoute}`, index);
+app.use(`/${protectRoute}`, posts);
 // app.use(products);
 // app.use(checkout);
 
