@@ -69,13 +69,75 @@ router.post(
   "/post/edit/:id",
   upload.array("uploadedFile"),
   async function (req, res) {
-    console.log(req.body);
-    console.log(".");
-    console.log(".");
-    console.log(".");
-    console.log(req.files);
+    var getPost = await Post.findById(req.params.id);
+
+    // ====================
+    // uploadedFileOriginal
+    // parse uploadedFileOriginal from frontend
+    //=========================================
+    var uploadedFileOriginalData = req.body.uploadedFileOriginal;
+    var uploadedFileOriginal = [];
+    var str = "";
+    var i = 0;
+    for (var i = 0; i < uploadedFileOriginalData.length; i++) {
+      if (uploadedFileOriginalData[i] !== " ") {
+        str = str + uploadedFileOriginalData[i];
+      }
+      if (
+        uploadedFileOriginalData[i] === " " ||
+        i + 1 === uploadedFileOriginalData.length
+      ) {
+        uploadedFileOriginal.push(str);
+        str = "";
+      }
+    }
+
+    var uploadedFileOriginal2 = [];
+    for (var i = 0; i < uploadedFileOriginal.length; i++) {
+      // f means filename
+      var f = uploadedFileOriginal[i];
+
+      for (var j = 0; j < getPost["uploadedFile"].length; j++) {
+        if (f === getPost["uploadedFile"][j]["filename"]) {
+          uploadedFileOriginal2.push(getPost["uploadedFile"][j]);
+          break;
+        }
+      }
+    }
+
+    // ============
+    // uploadedFile
+    // ============
+    var uploadedFile = [...uploadedFileOriginal2];
+    for (var i = 0; i < req.files.length; i++) {
+      var obj = {};
+      obj["filename"] = req.files[i]["filename"];
+      obj["path"] = req.files[i]["path"];
+      uploadedFile.push(obj);
+    }
+
+    var data = {
+      title: req.body.title,
+      date: req.body.date,
+      readTime: req.body.readTime,
+      uploadedFile: uploadedFile,
+      description: req.body.description,
+      author: getPost["author"],
+    };
+
+    await Post.findByIdAndUpdate(req.params.id, data);
+    return res.json("Post updated");
   }
 );
+
+// ================
+// /post/delete/:id
+// ================
+router.get("/post/delete/:id", async function (req, res) {
+  await Post.findByIdAndDelete(req.params.id);
+
+  res.json("Post deleted");
+});
 
 // =======
 // exports
