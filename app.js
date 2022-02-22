@@ -7,7 +7,7 @@ require("dotenv").config();
 // require routes
 var index = require("./routes/index");
 var posts = require("./routes/posts");
-// var products = require("./routes/products");
+var comments = require("./routes/comments");
 // var checkout = require("./routes/checkout");
 
 // ===
@@ -40,6 +40,7 @@ connection.once("open", function () {
 // ======
 app.use(`/${protectRoute}`, index);
 app.use(`/${protectRoute}`, posts);
+app.use(`/${protectRoute}`, comments);
 // app.use(products);
 // app.use(checkout);
 
